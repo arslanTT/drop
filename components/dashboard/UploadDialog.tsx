@@ -1,0 +1,119 @@
+"use client";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  ImageKitAbortError,
+  ImageKitInvalidRequestError,
+  ImageKitServerError,
+  ImageKitUploadNetworkError,
+  upload,
+} from "@imagekit/next";
+import { Button } from "@/components/ui/button";
+import { useRef, useState } from "react";
+
+export default function UploadDialog({
+  userId,
+  parentId,
+}: {
+  userId: string;
+  parentId: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [progress, setProgress] = useState(0);
+  const abortController = new AbortController();
+
+  const authenticator = async () => {
+    try {
+      const response = await fetch("/api/upload-auth");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Request failed with status ${response.status}: ${errorText}`
+        );
+      }
+      const data = await response.json();
+      console.log("DATA______------>>>", data);
+      const { signature, expire, token, publicKey } = data;
+      return { signature, expire, token, publicKey };
+    } catch (error) {
+      console.error("Authentication error:", error);
+      throw new Error("Authentication request failed");
+    }
+  };
+  const handleUpload = async () => {
+    const fileInput = fileInputRef.current;
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      alert("Please select a file to upload");
+      return;
+    }
+    const file = fileInput.files[0];
+    let authParams;
+    try {
+      authParams = await authenticator();
+    } catch (authError) {
+      console.error("Failed to authenticate for upload:", authError);
+      return;
+    }
+    const { signature, expire, token, publicKey } = authParams;
+    try {
+      const uploadResponse = await upload({
+        // Authentication parameters
+        expire,
+        token,
+        signature,
+        publicKey,
+        file,
+        fileName: file.name, // Optionally set a custom file name
+        // Progress callback to update upload progress state
+        onProgress: (event) => {
+          setProgress((event.loaded / event.total) * 100);
+        },
+        // Abort signal to allow cancellation of the upload if needed.
+        abortSignal: abortController.signal,
+      });
+      const uploadToDB = await fetch("/api/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imagekit: uploadResponse, userId, parentId }),
+      });
+      console.log("Data Send to DB ===>");
+    } catch (error) {
+      // Handle specific error types provided by the ImageKit SDK.
+      if (error instanceof ImageKitAbortError) {
+        console.error("Upload aborted:", error.reason);
+      } else if (error instanceof ImageKitInvalidRequestError) {
+        console.error("Invalid request:", error.message);
+      } else if (error instanceof ImageKitUploadNetworkError) {
+        console.error("Network error:", error.message);
+      } else if (error instanceof ImageKitServerError) {
+        console.error("Server error:", error.message);
+      } else {
+        // Handle any other errors that may occur.
+        console.error("Upload error:", error);
+      }
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Upload File</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upload File</DialogTitle>
+        </DialogHeader>
+        <input type="file" ref={fileInputRef} />
+        <Button onClick={handleUpload}>Upload</Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
