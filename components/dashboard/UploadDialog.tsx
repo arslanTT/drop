@@ -15,15 +15,20 @@ import {
 } from "@imagekit/next";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
 export default function UploadDialog({
   userId,
   parentId,
+  refreshFiles,
 }: {
   userId: string;
   parentId: string | null;
+  refreshFiles: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [disableIt, setDisableIt] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState(0);
   const abortController = new AbortController();
@@ -38,7 +43,6 @@ export default function UploadDialog({
         );
       }
       const data = await response.json();
-      console.log("DATA______------>>>", data);
       const { signature, expire, token, publicKey } = data;
       return { signature, expire, token, publicKey };
     } catch (error) {
@@ -47,8 +51,10 @@ export default function UploadDialog({
     }
   };
   const handleUpload = async () => {
+    setDisableIt(true);
     const fileInput = fileInputRef.current;
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      setDisableIt(false);
       alert("Please select a file to upload");
       return;
     }
@@ -77,6 +83,7 @@ export default function UploadDialog({
         // Abort signal to allow cancellation of the upload if needed.
         abortSignal: abortController.signal,
       });
+      setDisableIt(!disableIt);
       const uploadToDB = await fetch("/api/upload", {
         method: "POST",
         headers: {
@@ -84,7 +91,19 @@ export default function UploadDialog({
         },
         body: JSON.stringify({ imagekit: uploadResponse, userId, parentId }),
       });
-      console.log("Data Send to DB ===>");
+      if (!uploadToDB.ok) {
+        toast.error("Failed to save file to database", {
+          position: "bottom-center",
+          richColors: true,
+        });
+      }
+      // const uDB = await uploadToDB.json();
+      // console.log(uDB);
+      setDisableIt(false);
+      toast("Upload successful!", {
+        position: "top-center",
+        richColors: true,
+      });
     } catch (error) {
       // Handle specific error types provided by the ImageKit SDK.
       if (error instanceof ImageKitAbortError) {
@@ -112,7 +131,16 @@ export default function UploadDialog({
           <DialogTitle>Upload File</DialogTitle>
         </DialogHeader>
         <input type="file" ref={fileInputRef} />
-        <Button onClick={handleUpload}>Upload</Button>
+        {!disableIt ? (
+          <Button disabled={disableIt} onClick={handleUpload}>
+            Upload
+          </Button>
+        ) : (
+          <Button size="sm" disabled>
+            <Loader2Icon className="animate-spin" />
+            Please wait
+          </Button>
+        )}
       </DialogContent>
     </Dialog>
   );

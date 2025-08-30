@@ -52,6 +52,7 @@ export default function SignInForm() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
+        // window.location.assign("/dashboard");
         router.push("/dashboard");
       } else {
         console.error("Sign-in incomplete:", result);

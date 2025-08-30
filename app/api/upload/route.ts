@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const body = await req.json();
-    const { imagekit, userId: bodyUserId } = body;
+    const { imagekit, userId: bodyUserId, parentId } = body;
     if (bodyUserId !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -29,14 +29,15 @@ export async function POST(req: NextRequest) {
       fileUrl: imagekit.url,
       thumbnailUrl: imagekit.thumbnailUrl || null,
       userId: userId,
-      parentId: null,
+      parentId: parentId || null,
       isFolder: false,
       isStarred: false,
       isTrash: false,
     };
 
     const [newFiles] = await db.insert(files).values(fileData).returning();
-    return NextResponse.json(newFiles);
+    // console.log(newFiles);
+    return NextResponse.json(newFiles || []);
   } catch (error) {
     console.log(error);
     return NextResponse.json(
