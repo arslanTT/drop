@@ -17,7 +17,6 @@ export default function FolderCard({ folder, onClick }: any) {
 
   const handleDownload = () => {
     alert(`Download folder: ${folder.name}`);
-    // 🔹 Later: use fetch or file.fileUrl to trigger download
   };
   return (
     <Card onClick={onClick} className="cursor-pointer hover:bg-gray-100">

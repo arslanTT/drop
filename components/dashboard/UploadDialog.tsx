@@ -75,12 +75,10 @@ export default function UploadDialog({
         signature,
         publicKey,
         file,
-        fileName: file.name, // Optionally set a custom file name
-        // Progress callback to update upload progress state
+        fileName: file.name,
         onProgress: (event) => {
           setProgress((event.loaded / event.total) * 100);
         },
-        // Abort signal to allow cancellation of the upload if needed.
         abortSignal: abortController.signal,
       });
       setDisableIt(!disableIt);
@@ -97,15 +95,13 @@ export default function UploadDialog({
           richColors: true,
         });
       }
-      // const uDB = await uploadToDB.json();
-      // console.log(uDB);
+
       setDisableIt(false);
       toast("Upload successful!", {
         position: "top-center",
         richColors: true,
       });
     } catch (error) {
-      // Handle specific error types provided by the ImageKit SDK.
       if (error instanceof ImageKitAbortError) {
         console.error("Upload aborted:", error.reason);
       } else if (error instanceof ImageKitInvalidRequestError) {
@@ -115,7 +111,6 @@ export default function UploadDialog({
       } else if (error instanceof ImageKitServerError) {
         console.error("Server error:", error.message);
       } else {
-        // Handle any other errors that may occur.
         console.error("Upload error:", error);
       }
     }

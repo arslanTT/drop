@@ -1,4 +1,3 @@
-// components/dashboard/FileExplorer.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -49,7 +48,6 @@ export default function FileExplorer({ userId }: { userId: string }) {
     setBreadcrumbs((prev) => [...prev, { id: folder.id, name: folder.name }]);
   };
 
-  // 🔹 When clicking on breadcrumb
   const handleBreadcrumbClick = (id: string | null, index: number) => {
     setCurrentParentId(id);
     setBreadcrumbs((prev) => prev.slice(0, index + 1));

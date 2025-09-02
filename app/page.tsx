@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Folder, Upload, Shield } from "lucide-react";
 import TechStack from "@/components/TechStack";
-import { ModeToggle } from "@/components/darkMode";
 
 export default function Home() {
   return (

@@ -25,7 +25,6 @@ export default function FileCard({ file }: any) {
 
   const handleDownload = () => {
     alert(`Download file: ${file.name}`);
-    // 🔹 Later: use fetch or file.fileUrl to trigger download
   };
   return (
     <Card className="p-4">
@@ -34,8 +33,8 @@ export default function FileCard({ file }: any) {
           <Image
             src={file.thumbnailUrl || file.fileUrl}
             alt={file.name}
-            width={64} // ✅ required
-            height={64} // ✅ required
+            width={64}
+            height={64}
             className="h-16 w-16 object-cover rounded"
           />
         ) : (
