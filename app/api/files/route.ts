@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { files } from "@/lib/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { isNull, eq, and } from "drizzle-orm";
+import { isNull, eq, and, desc, asc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -27,12 +27,14 @@ export async function GET(request: NextRequest) {
       usersFiles = await db
         .select()
         .from(files)
-        .where(and(eq(files.userId, userId), eq(files.parentId, parentId)));
+        .where(and(eq(files.userId, userId), eq(files.parentId, parentId)))
+        .orderBy(desc(files.isStarred), desc(files.isFolder), asc(files.name));
     } else {
       usersFiles = await db
         .select()
         .from(files)
-        .where(and(eq(files.userId, userId), isNull(files.parentId)));
+        .where(and(eq(files.userId, userId), isNull(files.parentId)))
+        .orderBy(desc(files.isStarred), desc(files.isFolder), asc(files.name));
     }
     return NextResponse.json(usersFiles);
   } catch (error) {

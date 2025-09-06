@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function CreateFolderDialog({
   userId,
@@ -26,7 +27,7 @@ export default function CreateFolderDialog({
       method: "POST",
       body: JSON.stringify({ userId, parentId, name: folderName }),
     });
-    alert(`Folder ${folderName} created`);
+    toast.success(`Folder ${folderName} created`);
     setOpen(false);
     setFolderName("");
   };
