@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, FolderIcon, Star, StarOff, Trash2 } from "lucide-react";
+import { FolderIcon, Star, StarOff, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";

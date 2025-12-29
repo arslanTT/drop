@@ -22,7 +22,7 @@ export default function FileExplorer({ userId }: { userId: string }) {
   const [files, setFiles] = useState<FileItem[] | []>([]);
   const [currentParentId, setCurrentParentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
+  /////////////////////////////////////////////////////////////////////////
   const [breadcrumbs, setBreadcrumbs] = useState<
     { id: string | null; name: string }[]
   >([{ id: null, name: "Home" }]);
@@ -47,7 +47,6 @@ export default function FileExplorer({ userId }: { userId: string }) {
     setCurrentParentId(folder.id);
     setBreadcrumbs((prev) => [...prev, { id: folder.id, name: folder.name }]);
   };
-
   const handleBreadcrumbClick = (id: string | null, index: number) => {
     setCurrentParentId(id);
     setBreadcrumbs((prev) => prev.slice(0, index + 1));
