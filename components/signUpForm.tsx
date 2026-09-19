@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSignUp } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
 
@@ -29,14 +28,13 @@ import {
 import { signUpSchema } from "@/schemas/signUpSchema";
 
 export default function SignUpForm() {
-  const router = useRouter();
   const { signUp, isLoaded, setActive } = useSignUp();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationError, setVerificationError] = useState<string | null>(
-    null
+    null,
   );
 
   // Initialize form
@@ -59,7 +57,7 @@ export default function SignUpForm() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setAuthError(
-        error.errors?.[0]?.message || "Sign-up error—please try again."
+        error.errors?.[0]?.message || "Sign-up error—please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -77,12 +75,12 @@ export default function SignUpForm() {
       });
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/dashboard");
+        window.location.assign("/dashboard");
       } else setVerificationError("Verification incomplete—please try again.");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setVerificationError(
-        error.errors?.[0]?.message || "Verification error—try again."
+        error.errors?.[0]?.message || "Verification error—try again.",
       );
     } finally {
       setIsSubmitting(false);

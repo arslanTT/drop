@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
 import { signInSchema } from "@/schemas/signInSchema";
@@ -21,7 +20,6 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 export default function SignInForm() {
-  const router = useRouter();
   const { signIn, isLoaded, setActive } = useSignIn();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -52,8 +50,7 @@ export default function SignInForm() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        // window.location.assign("/dashboard");
-        router.push("/dashboard");
+        window.location.assign("/dashboard");
       } else {
         console.error("Sign-in incomplete:", result);
         setAuthError("Sign-in could not be completed. Please try again.");
@@ -63,7 +60,7 @@ export default function SignInForm() {
       console.error("Sign-in error:", error);
       setAuthError(
         error.errors?.[0]?.message ||
-          "An error occurred during sign-in. Please try again."
+          "An error occurred during sign-in. Please try again.",
       );
     } finally {
       setIsSubmitting(false);

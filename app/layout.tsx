@@ -30,14 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={` antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased">
+        <ClerkProvider>
           <Providers>{children}</Providers>
-
           <Toaster />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
